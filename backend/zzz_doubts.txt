@@ -1,0 +1,9 @@
+🤔 Why include src problem? https://chatgpt.com/c/690f5228-2d90-8322-bd3e-dcb16b8c9034
+✅
+
+🔴 import "express" from express # This is showing squiggly line error
+✅ + "type": "module"  in package.json
+
+🤔 I don't think that Logger middleware is even required.
+I think there are libraries like Morgan which does it for me.
+
