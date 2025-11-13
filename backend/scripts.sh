@@ -34,6 +34,8 @@ npm install pino pino-http
 # The install command invokes prisma generate for you which reads your Prisma schema and generates a version of Prisma Client that is tailored to your models.
 npm install @prisma/client
 
+# Then, run prisma generate which reads your Prisma schema and generates the Prisma Client.
+npx prisma generate
 
 # Copilot
 # Package	Use in Production?	Where to Put It
@@ -41,12 +43,19 @@ npm install @prisma/client
 # pino-http	✅ Yes	dependencies
 # pino-pretty	❌ No (dev only)	devDependencies
 
-
-
 npm i bcrypt jsonwebtoken
 npm i --save-dev @types/bcrypt @types/jsonwebtoken
 
 npm i multer
 npm i @types/multer --save-dev
+
+
+npm install cors # to send the data across different origins
+
+
+## After updating the prisma models, like here, changing image style to enum
+npx prisma migrate dev --name add_image_style_enum
+
+npx prisma migrate dev --name change_image_style_enum_to_lowercase
 
 npx tsc --init

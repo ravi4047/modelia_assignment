@@ -6,6 +6,7 @@ import { JWT_SECRET } from '../config/config.js';
 import { prisma } from '../db/prisma.js';
 import { LoginDto, SignUpDto } from '../dto/auth.dto.js';
 import { loginController, signUpController } from '../controllers/auth.controller.js';
+import { validateRequest } from '../middleware/validateRequest.middleware.js';
 
 const router = express.Router()
 
@@ -13,9 +14,9 @@ const router = express.Router()
 // const signupSchema = z.object({ email: z.email(), password: z.string().min(8) });
 
 // Signup
-router.post('/signup', signUpController)
+router.post('/signup', validateRequest(SignUpDto), signUpController)
 
 // Login
-router.post('/login', loginController)
+router.post('/login', validateRequest(LoginDto), loginController)
 
 export default router

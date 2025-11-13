@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken"
 import { JWT_SECRET } from '../config/config.js';
 import { UnauthorizedError } from "../errors/errorTypes.js";
 // import type User from "../models/user.model.js";
-import { UserSchema, type User } from "../models/user.model.js";
+import { JwtPayloadSchema, type User } from "../models/user.model.js";
 
 // Setting up the user data to be passed to the routes as a payload
 declare global {
@@ -14,7 +14,7 @@ declare global {
     }
 }
 
-export default function authHandler(req: Request, res: Response, next: NextFunction){
+export function authHandler(req: Request, res: Response, next: NextFunction){
     const header = req.headers.authorization
     if(!header?.startsWith('Bearer ')) return res.status(401).send({ error: 'Unauthorized' });
 
@@ -25,12 +25,13 @@ export default function authHandler(req: Request, res: Response, next: NextFunct
 
     try {
         const payload = jwt.verify(token, JWT_SECRET)
-        const parsed = UserSchema.safeParse(payload)
+        // const parsed = UserSchema.safeParse(payload)
+        const parsed = JwtPayloadSchema.safeParse(payload)
         if (!parsed.success)
             throw new UnauthorizedError('Invalid token payload')
 
         // ✅ Attach typed, validated user to req
-        req.user = parsed.data;
+        req.user = {uid: parsed.data.sub}
 
         next();
     } catch (error) {

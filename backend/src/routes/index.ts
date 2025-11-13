@@ -3,8 +3,8 @@ import authRouter from './auth.js'
 import generationRouter from './generations.js'
 
 const FullRoutes = (app:Application)=>{
-    app.use("/", authRouter)
-    app.use('/generation', generationRouter)
+    app.use("/api/auth", authRouter)
+    app.use('/api/generations', generationRouter)
 
     // Health check endpoint
     app.get('/health', (req, res) => {

@@ -2,6 +2,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { BCRYPT_ROUNDS, JWT_SECRET } from "../config/config.js";
 import { prisma } from '../db/prisma.js';
+import { UnauthorizedError } from '../errors/errorTypes.js';
+import type { JwtPayload } from '../models/user.model.js';
 
 
 class AuthService{
@@ -15,7 +17,12 @@ class AuthService{
                 data: { email, password: hashed },
             });
 
-            const token = jwt.sign({ sub: user.id, email: user.email }, JWT_SECRET, {
+            const payload: JwtPayload = {
+                sub: user.id,
+                email: user.email
+            }
+
+            const token = jwt.sign(payload, JWT_SECRET, {
                 expiresIn: '7d',
             });
 
@@ -35,19 +42,26 @@ class AuthService{
     static async login(email: string, password: string) {
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
-            const e: any = new Error('Invalid credentials');
-            e.status = 401;
-            throw e;
+            // const e: any = new Error('Invalid credentials');
+            // e.status = 401;
+            // throw e;
+            throw new UnauthorizedError('Invalid credentials')
         }
 
         const ok = await bcrypt.compare(password, user.password);
         if (!ok) {
-            const e: any = new Error('Invalid credentials');
-            e.status = 401;
-            throw e;
+            // const e: any = new Error('Invalid credentials');
+            // e.status = 401;
+            // throw e; 
+            throw new UnauthorizedError('Invalid credentials')
         }
 
-        const token = jwt.sign({ sub: user.id, email: user.email }, JWT_SECRET, {
+        const payload: JwtPayload = {
+            sub: user.id,
+            email: user.email
+        }
+
+        const token = jwt.sign(payload, JWT_SECRET, {
             expiresIn: '7d',
         });
 
