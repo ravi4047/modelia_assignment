@@ -1,5 +1,5 @@
 import express, { type Application } from 'express';
-import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler.middleware.js';
 import FullRoutes from './routes/index.js';
 import { loggerMiddleware } from './middleware/loggerMiddleware.js';
 import path from 'path';
@@ -14,7 +14,7 @@ import generationRouter from './routes/generations.js'
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export default function App() {
+export default function App(): Application {
 
   const app = express();
 

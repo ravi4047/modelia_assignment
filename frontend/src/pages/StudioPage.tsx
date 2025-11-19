@@ -1,38 +1,65 @@
 // src/pages/StudioPage.tsx
 
-import React, { useState } from 'react';
+import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { GenerationForm } from '../components/generation/GenerationForm';
 import { GenerationHistory } from '../components/history/GenerationHistory';
-import type { Generation } from '../types';
+import type { Generation, ImageStyle } from '../types';
+
+export interface RestoreData {
+  imageUrl: string;
+  prompt: string;
+  // style: string;
+  style: ImageStyle
+}
 
 export function StudioPage() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [restoreData, setRestoreData] = useState<RestoreData | null>(null);
+
+  // Ref to trigger restoration in GenerationForm
+  const restoreTriggerRef = useRef(0);
+
 
   const handleGenerationSuccess = () => {
     // Trigger history refresh
     setRefreshTrigger(prev => prev + 1);
   };
 
-  const handleRestore = (generation: Generation) => {
-    // In a real app, you would restore the generation to the form
+  const handleRestore = async (generation: Generation) => {
     console.log('Restoring generation:', generation);
-    // You could implement this by lifting state up or using a context
+    
+    // Set the restore data which will be picked up by GenerationForm
+    setRestoreData({
+      imageUrl: generation.imageUrl,
+      prompt: generation.prompt,
+      style: generation.style,
+    });
+    
+    // Increment trigger to notify GenerationForm
+    restoreTriggerRef.current += 1;
+    
+    // Scroll to form smoothly
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-  
+
+  const handleRestoreComplete = () => {
+    // Clear restore data after it's been processed
+    setRestoreData(null);
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-4xl font-bold text-gray-900">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
             Image Generation Studio
           </h1>
-          <p className="mt-2 text-lg text-gray-600">
+          <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
             Transform your images with AI-powered artistic styles
           </p>
         </motion.div>
@@ -45,7 +72,12 @@ export function StudioPage() {
             transition={{ delay: 0.1 }}
             className="lg:col-span-2"
           >
-            <GenerationForm onSuccess={handleGenerationSuccess} />
+            <GenerationForm 
+              onSuccess={handleGenerationSuccess}
+              restoreData={restoreData}
+              restoreTrigger={restoreTriggerRef.current}
+              onRestoreComplete={handleRestoreComplete}
+            />
           </motion.div>
 
           {/* History - Takes 1 column on large screens */}

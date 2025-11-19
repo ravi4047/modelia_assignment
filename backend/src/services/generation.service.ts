@@ -5,6 +5,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import type { ImageStyle } from "@prisma/client";
+import { processUploadedImage } from "../utils/imageProcessor.js";
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -12,7 +13,6 @@ const __dirname = path.dirname(__filename);
 
 export default class GenerationService {
 
-    // Post generation
     static async postGeneration(uid: string, prompt: string, style: ImageStyle, file: Express.Multer.File) {
         // Simulate generation delay 1-2s
         await new Promise(r => setTimeout(r, 1000 + Math.random() * 1000));
@@ -22,30 +22,41 @@ export default class GenerationService {
             throw new ServiceUnavailableError("Model overloaded");
         }
 
-        // Generate a UUID for the file (Prisma will auto-generate id in the database)
+        // Generate a UUID for the file
         const fileId = crypto.randomUUID();
 
-        let imageUrl = '';
+        let image = '';
+        let thumbnail = '';
 
-        // Save file with unique filename
+        // Process and save both images
         try {
+            // Process images to standard sizes
+            const { fullImage, thumbnailImage } = await processUploadedImage(file.buffer);
+
             // Create uploads directory if it doesn't exist
             const uploadsDir = path.join(__dirname, '../../public/generated');
             await fs.mkdir(uploadsDir, { recursive: true });
 
-            // Generate unique filename with original extension
-            const ext = path.extname(file.originalname) || '.png';
-            const filename = `${fileId}${ext}`;
+            // Define filenames (using .jpg since we're converting to JPEG)
+            const filename = `${fileId}.jpg`;
+            const thumbnailFilename = `${fileId}_thumb.jpg`;
+            
             const filepath = path.join(uploadsDir, filename);
+            const thumbnailPath = path.join(uploadsDir, thumbnailFilename);
 
-            // Save file to disk
-            await fs.writeFile(filepath, file.buffer);
+            console.log("file path ", filepath)
+            console.log("thumbnail file path", thumbnailPath)
 
-            // Update imageUrl to point to the saved file
-            imageUrl = `/public/generated/${filename}`;
+            // Save both images
+            await fs.writeFile(filepath, fullImage);
+            await fs.writeFile(thumbnailPath, thumbnailImage);
+
+            // Set URLs
+            image = `/public/generated/${filename}`;
+            thumbnail = `/public/generated/${thumbnailFilename}`;
         } catch (error) {
-            console.error('Error saving file:', error);
-            throw new InternalServerError('Failed to save uploaded file')
+            console.error('Error processing/saving images:', error);
+            throw new InternalServerError('Failed to process and save images');
         }
 
         const created = await prisma.generation.create({
@@ -53,7 +64,8 @@ export default class GenerationService {
                 userId: uid,
                 prompt,
                 style,
-                imageUrl,
+                image,
+                thumbnail,
                 status: 'succeeded',
             }
         });
@@ -61,18 +73,6 @@ export default class GenerationService {
         return created;
     }
 
-    // Get generations
-    // static async getGenerations(uid:string, limit:number|undefined){
-    //     const nLimit = Math.min(Number(limit || 5), 50);
-        
-    //     const gens = await prisma.generation.findMany({
-    //         where: { userId: uid },
-    //         orderBy: { createdAt: 'desc' },
-    //         take: nLimit
-    //     });
-
-    //     return gens;
-    // }
 
     static async getGenerations(uid:string, page: number, limit:number){
         const nLimit = Math.min(Number(limit || 5), 50);
@@ -89,28 +89,11 @@ export default class GenerationService {
 
     // Get generation by id
     static async getGenerationById(uid:string, id: string){
-        // try {
-     
         const generation = await prisma.generation.findUnique({
             where: { id }, // or { id: idNum }
         });
 
         return generation;
-
-        // if (!generation) {
-        //     return 
-        // }
-
-        // return res.status(200).json({
-        //     success: true,
-        //     data: generation,
-        // });
-        // } catch (err) {
-        // return next(err);
-        // }
     }
 
-    // static async uploadImage(){
-
-    // }
 }

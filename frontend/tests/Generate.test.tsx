@@ -111,7 +111,7 @@ describe('GenerationForm', () => {
       error: null,
       attempt: 0,
       isRetrying: false,
-      result: { id: '1', prompt: 'test', style: 'realistic', userId: 'user1', originalImageUrl: '', generatedImageUrl: '', status: 'completed', createdAt: '' , updatedAt: ''},
+      result: { id: '1', prompt: 'test', style: 'realistic', imageUrl: '', thumbnailUrl: '', status: 'completed', createdAt: ''},
     });
 
     render(<GenerationForm onSuccess={mockOnSuccess} />);

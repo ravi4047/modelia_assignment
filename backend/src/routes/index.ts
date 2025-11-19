@@ -1,6 +1,7 @@
 import type { Application } from "express";
 import authRouter from './auth.js'
 import generationRouter from './generations.js'
+import healthRouter from './health.routes.js'
 
 const FullRoutes = (app:Application)=>{
     app.use("/api/auth", authRouter)

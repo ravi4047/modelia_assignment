@@ -1,0 +1,255 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, feature/auth, feature/frontend-core ]
+  pull_request:
+    branches: [ main, feature/auth, feature/frontend-core ]
+
+jobs:
+  backend-test:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./backend
+
+    # PostgreSQL service - needed because Prisma connects to actual database
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run ESLint
+      run: npm run lint
+      continue-on-error: true
+
+    - name: Check TypeScript types
+      run: npm run type-check
+
+    - name: Run Prettier check
+      run: npm run format:check
+      continue-on-error: true
+
+    # Generate Prisma Client and run migrations on test database
+    - name: Setup Prisma and Database
+      env:
+        DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
+      run: |
+        npm run generate
+        npx prisma migrate deploy
+
+    # Run tests with database connection
+    - name: Run unit tests with coverage
+      env:
+        DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
+        JWT_SECRET: test-secret-key-for-ci
+        NODE_ENV: test
+      run: npm run test:coverage
+
+    - name: Upload backend coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        files: ./backend/coverage/coverage-final.json
+        flags: backend
+        name: backend-coverage
+        fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}
+
+    - name: Archive backend coverage
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-coverage
+        path: backend/coverage/
+        retention-days: 30
+
+    - name: Build backend
+      run: npm run build
+
+  frontend-test:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    
+    # Only run if frontend files changed
+    # Remove this 'if' condition if you want it to always run
+    if: |
+      contains(github.event.head_commit.message, 'frontend') ||
+      contains(github.event.pull_request.title, 'frontend') ||
+      github.event_name == 'push'
+    
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run ESLint
+      run: npm run lint
+      continue-on-error: true
+
+    - name: Check TypeScript types
+      run: npm run type-check
+
+    - name: Run Prettier check
+      run: npm run format:check
+      continue-on-error: true
+
+    - name: Run unit tests with coverage
+      run: npm run test:coverage
+
+    - name: Upload frontend coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        files: ./frontend/coverage/coverage-final.json
+        flags: frontend
+        name: frontend-coverage
+        fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}
+
+    - name: Archive frontend coverage
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-coverage
+        path: frontend/coverage/
+        retention-days: 30
+
+    - name: Build frontend
+      run: npm run build
+      env:
+        VITE_API_URL: http://localhost:3000
+
+  e2e-test:
+    name: End-to-End Tests
+    runs-on: ubuntu-latest
+    needs: [backend-test, frontend-test]
+    
+    # PostgreSQL needed for E2E tests (backend needs database)
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+
+    - name: Install backend dependencies
+      working-directory: ./backend
+      run: npm ci
+
+    - name: Install frontend dependencies
+      working-directory: ./frontend
+      run: npm ci
+
+    - name: Setup backend database
+      working-directory: ./backend
+      env:
+        DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
+      run: |
+        npm run generate
+        npx prisma migrate deploy
+
+    - name: Build backend
+      working-directory: ./backend
+      run: npm run build
+
+    - name: Start backend server
+      working-directory: ./backend
+      env:
+        DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
+        JWT_SECRET: test-secret-key-for-e2e
+        NODE_ENV: test
+        PORT: 3000
+      run: |
+        npm start &
+        npx wait-on http://localhost:3000/health --timeout 30000
+
+    - name: Build frontend
+      working-directory: ./frontend
+      env:
+        VITE_API_URL: http://localhost:3000
+      run: npm run build
+
+    - name: Start frontend server
+      working-directory: ./frontend
+      run: |
+        npm run preview -- --port 4173 --host &
+        npx wait-on http://localhost:4173 --timeout 30000
+
+    - name: Install Playwright browsers
+      working-directory: ./frontend
+      run: npx playwright install --with-deps chromium
+
+    - name: Run E2E tests
+      working-directory: ./frontend
+      run: npm run test:e2e
+      env:
+        BASE_URL: http://localhost:4173
+
+    - name: Upload E2E test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-report
+        path: frontend/playwright-report/
+        retention-days: 30
+
+    - name: Upload E2E test videos
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-videos
+        path: frontend/test-results/
+        retention-days: 14

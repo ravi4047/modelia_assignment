@@ -81,12 +81,26 @@ export interface Generation {
   // originalImageUrl: string;
   // generatedImageUrl: string;
   imageUrl: string;
+  thumbnailUrl: string;
   prompt: string;
   style: ImageStyle;
   status: 'pending' | 'completed' | 'failed';
   createdAt: string;
   // updatedAt: string;
 }
+
+// export interface ThumbnailGeneration {
+//   id: string;
+//   // userId: string;
+//   // originalImageUrl: string;
+//   // generatedImageUrl: string;
+//   thumbnailUrl: string;
+//   prompt: string;
+//   style: ImageStyle;
+//   status: 'pending' | 'completed' | 'failed';
+//   createdAt: string;
+//   // updatedAt: string;
+// }
 
 export interface GenerationResponse {
   success: boolean;
@@ -101,6 +115,7 @@ export interface GenerationHistoryResponse {
   //   page: number;
   //   limit: number;
   // };
+  // data: Generation[]
   data: Generation[]
 }
 

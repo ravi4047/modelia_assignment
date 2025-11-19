@@ -17,11 +17,6 @@ export const PostGenerationDto = z.object({
     // Note: file is handled by multer, not Zod
 })
 
-
-// export const GetGenerationDto = z.object({
-//     limit: z.string()
-// })
-
 export const GetGenerationDto = z.object({
   page: z
     .string()

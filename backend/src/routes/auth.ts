@@ -10,9 +10,6 @@ import { validateRequest } from '../middleware/validateRequest.middleware.js';
 
 const router = express.Router()
 
-// TODO Need a comment here
-// const signupSchema = z.object({ email: z.email(), password: z.string().min(8) });
-
 // Signup
 router.post('/signup', validateRequest(SignUpDto), signUpController)
 

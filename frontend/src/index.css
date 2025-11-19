@@ -15,5 +15,196 @@
 
 /* https://tailwindcss.com/docs/installation/using-vite */
 
+/* @import "tailwindcss";
+
+@import "tailwindcss/preflight"; */
+
+/* @import "tailwindcss/base"; */
+/* @import "tailwindcss/components"; */
+
+/* @tailwind base; */
+/* @tailwind components; */
+/* @import "tailwindcss/utilities"; */
+
+
+/* .light{
+  --background: #ff0000;
+  --foreground: #000000;
+  --border: #e5e7eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  .dark {
+    --background: #1f2937;
+    --foreground: #f9fafb;
+    --border: #374151;
+  }
+} */
+
+/* @import "tailwindcss";
+
+@layer base {
+  /* Light mode variables (default) */
+
+
 @import "tailwindcss";
 
+/* Configure dark mode for Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  /* Root variables for smooth transitions */
+  :root {
+    --transition-bg: background-color 200ms ease-in-out;
+    --transition-border: border-color 200ms ease-in-out;
+    --transition-color: color 200ms ease-in-out;
+  }
+
+  /* Smooth color transitions for dark mode */
+  * {
+    @apply transition-colors duration-200;
+  }
+
+  /* Base styles */
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+  }
+
+  /* Ensure images and media respect dark mode */
+  img {
+    @apply max-w-full h-auto;
+  }
+}
+
+@layer components {
+  /* Custom scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-gray-800;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400 dark:bg-gray-500;
+  }
+
+  /* Card component */
+  .card {
+    @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md dark:shadow-gray-900/50;
+  }
+
+  /* Input component */
+  .input-base {
+    @apply bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100;
+  }
+
+  /* Button component */
+  .btn-base {
+    @apply transition-all duration-200 ease-in-out;
+  }
+}
+
+@layer utilities {
+  /* Custom gradient utilities for dark mode */
+  .bg-gradient-primary {
+    @apply bg-gradient-to-r from-blue-500 to-indigo-600 dark:from-blue-600 dark:to-indigo-700;
+  }
+
+  .bg-gradient-secondary {
+    @apply bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700;
+  }
+
+  /* Text gradient utilities */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400;
+  }
+
+  /* Shadow utilities for dark mode */
+  .shadow-light {
+    @apply shadow-md dark:shadow-gray-900/50;
+  }
+
+  .shadow-light-lg {
+    @apply shadow-lg dark:shadow-gray-900/50;
+  }
+}
+
+/* Animation keyframes */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 1000px 100%;
+}
+
+/* Dark mode specific adjustments */
+@media (prefers-color-scheme: dark) {
+  /* Ensure proper contrast for focus rings */
+  *:focus-visible {
+    @apply ring-offset-gray-900;
+  }
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin 3s linear infinite;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Slide up animation */
+@keyframes slideUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}

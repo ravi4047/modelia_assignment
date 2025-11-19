@@ -58,4 +58,14 @@ npx prisma migrate dev --name add_image_style_enum
 
 npx prisma migrate dev --name change_image_style_enum_to_lowercase
 
+# Install sharp
+npm install sharp
+
+
+# Super Test
+npm install --save-dev supertest @types/supertest
+
+npm install --save-dev jest @types/jest ts-jest
+npx ts-jest config:init
+
 npx tsc --init

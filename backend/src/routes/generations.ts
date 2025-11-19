@@ -1,7 +1,7 @@
 import express from 'express';
 import {authHandler} from '../middleware/index.js';
 import multer from 'multer';
-import { getGenerationByIdController, getGenerationsController, postGenerationController } from '../controllers/generations.js';
+import { getGenerationByIdController, getGenerationsController, postGenerationController } from '../controllers/generation.controller.js';
 import { GetGenerationByIdDto, GetGenerationDto, PostGenerationDto } from '../dto/generation.dto.js';
 import { validateRequest } from '../middleware/validateRequest.middleware.js';
 import { validateParams } from '../middleware/validateParams.middleware.js';

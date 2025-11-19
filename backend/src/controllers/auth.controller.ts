@@ -1,9 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
 import { LoginDto, SignUpDto } from "../dto/auth.dto.js";
-import { prisma } from "../db/prisma.js";
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from "../config/config.js";
 import AuthService from "../services/auth.service.js";
 import type AuthResponse from "../response/auth.response.js";
 

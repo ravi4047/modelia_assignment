@@ -1,6 +1,6 @@
 // src/App.tsx
 
-import React from 'react';
+// import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider} from './contexts/AuthContext';
 import { LoginForm, SignupForm} from './components/auth/AuthForms';
@@ -33,6 +33,7 @@ function AuthLayoutWrapper({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+
   return (
     <BrowserRouter>
       <AuthProvider>

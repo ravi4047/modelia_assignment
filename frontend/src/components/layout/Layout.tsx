@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { LogOut, ChevronDown, User } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { ConfirmModal } from '../ui/ConfirmModal';
+import { DarkToggle } from '../ui/DarkToggle';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -43,15 +44,15 @@ export function Layout({ children }: LayoutProps) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-800">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Brand */}
             <div className="flex items-center gap-3">
-              {/* Logo: use public/logo.png */}
-              <div className="w-10 h-10 rounded-lg overflow-hidden shadow-md">
+              {/* Logo: use public/modelia_logo.jpg */}
+              <div className="w-10 h-10 rounded-lg overflow-hidden shadow-md border border-gray-200 dark:border-gray-700">
                 <img
                   src="/modelia_logo.jpg"
                   alt="Modelia"
@@ -60,23 +61,27 @@ export function Layout({ children }: LayoutProps) {
               </div>
 
               <div>
-                <h1 className="text-lg sm:text-xl font-semibold tracking-tight">
+                <h1 className="text-lg sm:text-xl font-semibold tracking-tight text-gray-900 dark:text-white">
                   Modelia
                 </h1>
-                <p className="text-xs text-gray-500">Image Generation Studio</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Image Generation Studio
+                </p>
               </div>
             </div>
 
             {/* Right side: profile dropdown */}
             <div className="flex items-center gap-3">
-
               {/* New Generation Button */}
               <button
                 onClick={() => window.location.href = '/studio'}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg
                   text-white font-medium text-sm shadow-md
-                  bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-500
-                  hover:opacity-90 transition"
+                  bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600
+                  hover:from-pink-600 hover:via-purple-600 hover:to-indigo-700
+                  dark:from-pink-400 dark:via-purple-400 dark:to-indigo-500
+                  dark:hover:from-pink-500 dark:hover:via-purple-500 dark:hover:to-indigo-600
+                  transition-all duration-200"
               >
                 <span>New Generation</span>
               </button>
@@ -84,14 +89,19 @@ export function Layout({ children }: LayoutProps) {
               {/* Docs Button */}
               <button
                 className="inline-flex items-center gap-2 px-3 py-2 
-                  rounded-md bg-white border border-gray-200
-                  text-sm text-gray-700 shadow-sm hover:bg-gray-50 transition"
+                  rounded-md bg-white dark:bg-gray-800 
+                  border border-gray-200 dark:border-gray-700
+                  text-sm text-gray-700 dark:text-gray-300 
+                  shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 
+                  transition-all duration-200"
               >
                 Docs
               </button>
 
+              {/* Dark Toggle */}
+              <DarkToggle />
 
-              {/* optionally some quick actions can go here */}
+              {/* Profile dropdown */}
               <div className="relative">
                 <button
                   ref={buttonRef}
@@ -99,21 +109,21 @@ export function Layout({ children }: LayoutProps) {
                   aria-haspopup="true"
                   aria-expanded={open}
                   onClick={() => setOpen((v) => !v)}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-full shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 
+                    bg-white dark:bg-gray-800 
+                    border border-gray-200 dark:border-gray-700 
+                    rounded-full shadow-sm hover:shadow-md 
+                    focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:focus:ring-indigo-500
+                    dark:focus:ring-offset-gray-900
+                    transition-all duration-200"
                 >
-                  <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100">
-                    {/* show logo as avatar if available otherwise simple icon */}
-                    {/* <img
-                      src="/logo.png"
-                      alt="avatar"
-                      className="w-full h-full object-cover"
-                    /> */}
-                    <User className="w-6 h-6 text-gray-400 m-1" />
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700">
+                    <User className="w-6 h-6 text-gray-400 dark:text-gray-500 m-1" />
                   </div>
-                  <span className="hidden sm:inline-block text-sm font-medium text-gray-700">
+                  <span className="hidden sm:inline-block text-sm font-medium text-gray-700 dark:text-gray-300">
                     {user?.email?.split?.('@')?.[0] ?? 'Profile'}
                   </span>
-                  <ChevronDown className={`w-4 h-4 text-gray-500 ${open ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
                 </button>
 
                 {/* Dropdown panel */}
@@ -122,24 +132,28 @@ export function Layout({ children }: LayoutProps) {
                     ref={panelRef}
                     role="menu"
                     aria-orientation="vertical"
-                    className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-lg shadow-lg z-50 overflow-hidden"
+                    className="absolute right-0 mt-2 w-56 
+                      bg-white dark:bg-gray-800 
+                      border border-gray-100 dark:border-gray-700 
+                      rounded-lg shadow-lg dark:shadow-gray-900/50 
+                      z-50 overflow-hidden animate-fade-in"
                   >
-                    <div className="px-4 py-3">
-                      <p className="text-xs text-gray-400">Signed in as</p>
-                      <p className="text-sm font-medium text-gray-800 truncate">
+                    <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                      <p className="text-xs text-gray-400 dark:text-gray-500">Signed in as</p>
+                      <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
                         {user?.email ?? '—'}
                       </p>
                     </div>
 
-                    <div className="border-t border-gray-100" />
-
                     <button
                       type="button"
                       onClick={() => setOpenConfirm(true)}
-                      className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition"
+                      className="w-full text-left px-4 py-3 flex items-center gap-3 
+                        hover:bg-gray-50 dark:hover:bg-gray-700 
+                        transition-colors duration-200"
                     >
-                      <LogOut className="w-4 h-4 text-gray-600" />
-                      <span className="text-sm text-gray-700">Logout</span>
+                      <LogOut className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Logout</span>
                     </button>
                   </div>
                 )}
@@ -154,7 +168,7 @@ export function Layout({ children }: LayoutProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">{children}</div>
       </main>
 
-      {/* // then render ConfirmModal (place near end of component JSX) */}
+      {/* ConfirmModal */}
       <ConfirmModal 
         open={openConfirm}
         title="Log out?"
@@ -162,7 +176,7 @@ export function Layout({ children }: LayoutProps) {
         onCancel={() => setOpenConfirm(false)}
         onConfirm={() => {
           setOpenConfirm(false);
-          setOpen(false); // close dropdown too
+          setOpen(false);
           logout();
         }}
         confirmText="Log out"
@@ -170,11 +184,10 @@ export function Layout({ children }: LayoutProps) {
       />
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-12">
+      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <p className="text-center text-sm text-gray-500">
-            © {new Date().getFullYear()} Modelia. Built with React, TypeScript, and
-            Express.
+          <p className="text-center text-sm text-gray-500 dark:text-gray-400">
+            © {new Date().getFullYear()} Modelia. Built with React, TypeScript, and Express.
           </p>
         </div>
       </footer>

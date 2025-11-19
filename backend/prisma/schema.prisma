@@ -35,7 +35,10 @@ model Generation {
   userId    String
   prompt    String
   style     ImageStyle
-  imageUrl  String
+  // imageUrl  String
+  // thumbnailUrl String
+  image     String  // We are renaming back to just image.
+  thumbnail String
   status    String
   createdAt DateTime   @default(now())
   user      User       @relation(fields: [userId], references: [id])

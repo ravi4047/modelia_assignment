@@ -7,7 +7,11 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",

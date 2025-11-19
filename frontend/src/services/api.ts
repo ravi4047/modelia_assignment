@@ -37,20 +37,6 @@ class ApiService {
       (error) => Promise.reject(error)
     );
 
-    // Response interceptor - handle errors
-    // this.client.interceptors.response.use(
-    //   (response) => response,
-    //   (error: AxiosError<ApiError>) => {
-    //     if (error.response?.status === 401) {
-    //       // Token expired or invalid
-    //       localStorage.removeItem('auth_token');
-    //       localStorage.removeItem('user');
-    //       window.location.href = '/login';
-    //     }
-    //     return Promise.reject(error);
-    //   }
-    // );
-
     // inside ApiService constructor -> response interceptor
     this.client.interceptors.response.use(
       (response) => response,
@@ -82,7 +68,6 @@ class ApiService {
         return Promise.reject(error);
       }
     );
-
 
   }
 

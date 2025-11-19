@@ -24,7 +24,8 @@ export async function postGenerationController(req:Request, res: Response, next:
         const baseUrl = `${req.protocol}://${req.get('host')}`;
         const payload: Generation = {
             ...created,
-            imageUrl: created.imageUrl ? `${baseUrl}${created.imageUrl}` : created.imageUrl,
+            imageUrl: created.image ? `${baseUrl}${created.image}` : created.image,
+            thumbnailUrl: created.thumbnail ? `${baseUrl}${created.thumbnail}` : created.thumbnail,
         };
 
         const response: GenerationResponse = {
@@ -56,9 +57,14 @@ export async function getGenerationsController(req: Request, res: Response, next
         const generations = await GenerationService.getGenerations(req.user!.uid, page, limit)
         const baseUrl = `${req.protocol}://${req.get('host')}`;
         const payload = generations.map(g => ({
-            ...g,
-            imageUrl: g.imageUrl ? `${baseUrl}${g.imageUrl}` : g.imageUrl,
-        }));
+            id: g.id,
+            createdAt: g.createdAt,
+            prompt: g.prompt,
+            style: g.style,
+            status: g.status,
+            imageUrl: g.image ? `${baseUrl}${g.image}` : g.image,
+            thumbnailUrl: g.thumbnail ? `${baseUrl}${g.thumbnail}` : g.thumbnail,
+        } as Generation));
 
         const response: GetGenerationsResponse = {
             success: true,
@@ -83,7 +89,8 @@ export async function getGenerationByIdController(req:Request, res: Response, ne
             const baseUrl = `${req.protocol}://${req.get('host')}`;
             const payload = {
                 ...generation,
-                imageUrl: generation.imageUrl ? `${baseUrl}${generation.imageUrl}` : generation.imageUrl,
+                imageUrl: generation.image ? `${baseUrl}${generation.image}` : generation.image,
+                thumbnailUrl: generation.thumbnail ? `${baseUrl}${generation.thumbnail}` : generation.thumbnail,
             };
 
             const response: GenerationResponse = {

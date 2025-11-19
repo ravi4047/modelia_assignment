@@ -5,13 +5,9 @@ export interface GenerationResponse{
     data: Generation
 }
 
-export interface GenerationResponse{
-    success: boolean
-    data: Generation
-}
-
 
 export interface GetGenerationsResponse{
     success: boolean
     data: Generation[]
 }
+
