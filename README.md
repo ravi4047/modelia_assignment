@@ -1,5 +1,7 @@
 # Modelia Mini AI Studio — README
 
+### [Video demo](https://drive.google.com/file/d/1rqymi2fvJrrZmsHimreNUU2938qkuFxr/view?usp=sharing)
+
 ## Env
 Copy `.env.example` to `.env` and set:
 - JWT_SECRET
