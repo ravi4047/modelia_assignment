@@ -5,13 +5,21 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma" // Remove the custom output path so that it uses the default
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum ImageStyle {
+  realistic
+  artistic
+  cartoon
+  cyberpunk
+  watercolor
 }
 
 model User {
@@ -23,12 +31,15 @@ model User {
 }
 
 model Generation {
-  id        String   @id
+  id        String     @id @default(uuid())
   userId    String
   prompt    String
-  style     String
-  imageUrl  String
+  style     ImageStyle
+  // imageUrl  String
+  // thumbnailUrl String
+  image     String  // We are renaming back to just image.
+  thumbnail String
   status    String
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime   @default(now())
+  user      User       @relation(fields: [userId], references: [id])
 }

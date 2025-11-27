@@ -1,0 +1,57 @@
+// Get generation by id
+    static async getGenerationById(uid:string, id: string){
+        // try {
+     
+        const generation = await prisma.generation.findUnique({
+            where: { id }, // or { id: idNum }
+        });
+
+        return generation;
+
+        // if (!generation) {
+        //     return 
+        // }
+
+        // return res.status(200).json({
+        //     success: true,
+        //     data: generation,
+        // });
+        // } catch (err) {
+        // return next(err);
+        // }
+    }
+
+    // static async uploadImage(){
+
+    // }
+
+
+export async function getGenerationByIdController(req:Request, res: Response, next: NextFunction) {
+    const {id} = GetGenerationByIdDto.parse(req.params)
+
+    try{
+        const generation = await GenerationService.getGenerationById(req.user!.uid, id)
+
+        if(!generation){
+            next(new BadRequestError())
+        }else{
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            const payload = {
+                ...generation,
+                imageUrl: generation.image ? `${baseUrl}${generation.image}` : generation.image,
+                thumbnailUrl: generation.thumbnail ? `${baseUrl}${generation.thumbnail}` : generation.thumbnail,
+            };
+
+            const response: GenerationResponse = {
+                success: true,
+                data: payload as any,
+            };
+            return res.status(200).json(response)
+        }
+    }catch(err){
+        next(err)
+    }
+}
+
+
+router.get('/:id', validateParams(GetGenerationByIdDto), getGenerationByIdController);

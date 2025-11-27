@@ -1,10 +1,13 @@
 import type {Request, Response, NextFunction } from "express";
-import type { ZodSchema } from "zod/v3";
 import * as z from 'zod'
 import { ValidationError } from "../errors/errorTypes.js";
+import { logger } from "../logs/logger.js";
 
 export const validateRequest = (schema: z.ZodObject) => {
   return (req: Request, res: Response, next: NextFunction): void => {
+    console.log("body", req.body)
+    console.log("file", req.file)
+    console.log(req.files)
     const validationResult = schema.safeParse(req.body);
 
     if (!validationResult.success) {
@@ -16,7 +19,6 @@ export const validateRequest = (schema: z.ZodObject) => {
 
       // Send a response if validation fails
       // res.status(400).json(unifiedResponse(false, 'Validation error', null, errorMessages));
-
 
       return next(new ValidationError(validationResult.error.message)); // Ensure no further middleware is called
     }

@@ -1,17 +1,22 @@
 import express from 'express';
-import authHandler from '../middleware/auth.js';
+import {authHandler} from '../middleware/index.js';
 import multer from 'multer';
-import { getGenerationsController, postGenerationController } from '../controllers/generations.js';
-import { GetGenerationDto, PostGenerationDto } from '../dto/generation.dto.js';
-import { validateRequest } from '../middleware/validation.middleware.js';
+import { getGenerationByIdController, getGenerationsController, postGenerationController } from '../controllers/generation.controller.js';
+import { GetGenerationByIdDto, GetGenerationDto, PostGenerationDto } from '../dto/generation.dto.js';
+import { validateRequest } from '../middleware/validateRequest.middleware.js';
+import { validateParams } from '../middleware/validateParams.middleware.js';
+import { validateQuery } from '../middleware/validateQuery.middleware.js';
 
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
-// const genSchema = z.object({ prompt: z.string().min(1), style: z.string().min(1) });
+// Apply authHandler to all routes in this router
+router.use(authHandler);
 
-router.post('/', authHandler, validateRequest(PostGenerationDto), upload.single('image'), postGenerationController)
-router.get('/', authHandler, validateRequest(GetGenerationDto), getGenerationsController);
+router.post('/', upload.single('image'), validateRequest(PostGenerationDto), postGenerationController)
+router.get('/', validateQuery(GetGenerationDto), getGenerationsController);
+
+router.get('/:id', validateParams(GetGenerationByIdDto), getGenerationByIdController);
 
 export default router;
